@@ -1,0 +1,48 @@
+CREATE DATABASE ForTestTask
+GO
+
+Use ForTestTask
+--создание таблиц для илюстрации типа связи многие-ко-многим(N:N)
+Create table Products
+(
+  ProductID int not null identity(1,1) primary key,
+  ProductName  nvarchar(50) not null
+)
+Create table Categories
+(
+  CategoryID int not null identity(1,1) primary key,
+  CategoryName  nvarchar(50) not null
+)
+Create table ProductsCategories
+(
+  ID int not null identity(1,1) Primary Key,
+  ProductID int foreign Key  References Products(ProductID),
+  CategoryID int foreign Key  References Categories(CategoryID)
+)
+--наполнение таблиц данными 
+Insert into Products(ProductName) Values (N'SmartPhone'),(N'SmartWatch'),
+,(N'Tablet'),(N'Laptop'),(N'SmartBook'),(N'UltraBook')
+
+Insert into Categories(CategoryName) Values (N'Xaomi'),
+(N'Mac'),(N'Huawei'),(N'Samsung'),(N'Honor'),(N'Nokia')
+--наполнение таблиц отвечающий за пары Продукт-Категория
+Insert into ProductsCategories(ProductID,CategoryID) Values (1,1),(1,3),(1,4),(1,5),(1,6)б
+                     (4,1),(4,2),(4,4),(5,1),(5,4),
+                         (2,1),(2,2),(2,4),(3,1),(3,4)
+
+--наполнение данными только по продукту(для создания так называемых весящих кортежей)
+Insert into Products Values (N'BagForLaptopXXX'),(N'SmartMarker66'),(N'JustBook88') 
+Insert into ProductCategories(ProductID) Values (7),(8),(9)--так же отслеживать самогенерирующееся
+ID можно через конструцкию OUTPUT либо создать тригер который из таблицы INSERTED так же могбы запрашивать
+ProductID
+--наполнение данными только по категории
+Insert into Categories Values (N'Safety glass'),(N'Headphones'),(N'HeadSet')                                        
+Insert into ProductsCategories(CategoryID) Values (7),(8),(9)  
+
+--для самого SQL запроса использую FullOuterJoin для отображения данных по продуктам-категориям не имеющих соответствующию пару
+SELECT  Distinct P.ProductName,C.CategoryName from ProductsCategories AS PC Full Join  Products AS P ON PC.ProductID=P.ProductID
+                       Full Join  Categories AS C ON PC.CategoryID=C.CategoryID
+--Distinct--применен для выборки только уникальных пар значений(либо просто значений)
+
+Full OUTER JOIN--Выборка будет содержать все строки из обоих таблиц вне завмсемости наличия соответствующих данных в другой таблице
+                                  
